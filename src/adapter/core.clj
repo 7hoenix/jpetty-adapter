@@ -1,4 +1,4 @@
-(ns ttt-adapter.core
+(ns adapter.core
   (:import (server Server WrappedServerSocket Handler Request Response ApplicationBuilder)
            (java.net ServerSocket))
   (:require [clojure.string :as string]))
