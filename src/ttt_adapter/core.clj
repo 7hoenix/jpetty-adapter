@@ -1,7 +1,10 @@
 (ns ttt-adapter.core
   (:import (server Server WrappedServerSocket Handler Request Response ApplicationBuilder)
-           (java.net ServerSocket))
-  (:require [clojure.string :as string]))
+           (java.net ServerSocket)
+           (java.io ByteArrayInputStream))
+  (:require [clojure.string :as string]
+            [clojure.tools.trace :as t]
+            [clojure.java.io :as io]))
 
 (defn- get-bytes-from-string [body]
   (-> (java.lang.StringBuilder. body)
@@ -18,17 +21,31 @@
       string/lower-case
       keyword))
 
+(defn prepare-query-string [params]
+  (reduce (fn [query-string [param-key param-value]]
+               (if (= query-string "")
+                 (str query-string param-key "=" param-value)
+                 (str query-string "&" param-key "=" param-value)))
+               ""
+               params))
+
+(defn- prepare-body [body]
+  (ByteArrayInputStream.
+    (.getBytes body)))
+
 (defn ringify [request]
   {:server-port 5000
    :server-name "jpetty"
    :remote-addr "localhost"
    :uri (.getPath request)
-   :query-string (.getPath request)
+   :query-string (prepare-query-string
+                   (.getParams request))
    :scheme :http
    :request-method (prepare-action
                      (.getAction request))
    :headers (.getHeaders request)
-   :body (.getBody request)})
+   :body (prepare-body
+           (.getBody request))})
 
 (defn- add-header [jpetty-response header-key header-value]
   (.setHeader jpetty-response
@@ -42,8 +59,8 @@
 
 (defn body-in-bytes [body]
   (cond
-    (= (type body) java.io.File) (slurp body)
-    (= (type body) String) body))
+    (.exists (io/as-file body)) (slurp body)
+    :else body))
 
 (defn de-ringify [ring-response]
   (-> (Response. (:status ring-response))

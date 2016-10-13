@@ -33,10 +33,16 @@
                     ringified-request (adapter/ringify jpetty-request)]
                 (should= "/" (:uri ringified-request))
                 (should= :get (:request-method ringified-request))
-                (should= "hi" (String. (:body ringified-request)))
+                (should= "hi" (slurp (:body ringified-request)))
                 (should= {"some-header" "boom"
                           "some-other-header" "ok"}
-                         (:headers ringified-request)))))
+                         (:headers ringified-request))))
+
+          (it "returns a body tag which is a java InputStream"
+              (let [jpetty-request (-> (mock-request "/" :get)
+                                       (.setBody "hello"))
+                    ringified-request (adapter/ringify jpetty-request)]
+                (should-be-a java.io.InputStream (:body ringified-request)))))
 
 (describe "de-ringify"
           (it "converts a ring response map into a jpetty response object"
@@ -64,3 +70,9 @@
           (it "can read a string and convert it to bytes"
               (let [body-in-bytes (adapter/body-in-bytes "great content")]
                 (should= "great content" (String. body-in-bytes)))))
+
+(describe "prepare-query-string"
+          (it "can read a map of parameters and return a query string"
+              (let [params {"arg1" "val1" "arg2" "val2"}
+                    result (adapter/prepare-query-string params)]
+                (should= "arg1=val1&arg2=val2" result))))
