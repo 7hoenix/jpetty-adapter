@@ -31,7 +31,7 @@
                     ringified-request (adapter/ringify jpetty-request)]
                 (should= "/" (:uri ringified-request))
                 (should= :get (:request-method ringified-request))
-                (should= "hi" (String. (:body ringified-request)))
+                (should= "hi" (slurp (:body ringified-request)))
                 (should= {"some-header" "boom"
                           "some-other-header" "ok"}
                          (:headers ringified-request)))))

@@ -28,7 +28,9 @@
    :request-method (prepare-action
                      (.getAction request))
    :headers (.getHeaders request)
-   :body (.getBody request)})
+   :body (java.io.ByteArrayInputStream.
+           (.getBytes
+             (.getBody request)))})
 
 (defn- add-header [jpetty-response header-key header-value]
   (.setHeader jpetty-response
