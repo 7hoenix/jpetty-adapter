@@ -12,9 +12,7 @@
       :body body})))
 
 (defn mock-request [path action]
-  (let [request (Request. path (clojure.string/upper-case (name action)))]
-    (println (.getAction request))
-    request))
+  (Request. path (clojure.string/upper-case (name action))))
 
 (defn mock-ring-response
   ([status] (mock-ring-response status {}))

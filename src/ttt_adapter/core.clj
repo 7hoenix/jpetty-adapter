@@ -63,7 +63,7 @@
 
 (defn run-jpetty [application]
   (let [ring-application (.build
-                           (ApplicationBuilder/setHandler
+                           (ApplicationBuilder/forHandler
                              (wrap-ring application)))
         wrapped-server-socket (WrappedServerSocket. (ServerSocket. 5000)
                                                     ring-application)
