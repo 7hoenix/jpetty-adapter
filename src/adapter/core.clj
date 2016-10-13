@@ -1,4 +1,4 @@
-(ns ttt-adapter.core
+(ns adapter.core
   (:import (server Server WrappedServerSocket Handler Request Response ApplicationBuilder)
            (java.net ServerSocket)
            (java.io ByteArrayInputStream))
@@ -45,8 +45,9 @@
    :request-method (prepare-action
                      (.getAction request))
    :headers (.getHeaders request)
-   :body (prepare-body
-           (.getBody request))})
+   :body (java.io.ByteArrayInputStream.
+           (.getBytes
+             (.getBody request)))})
 
 (defn- add-header [jpetty-response header-key header-value]
   (.setHeader jpetty-response

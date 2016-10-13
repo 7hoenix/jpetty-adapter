@@ -1,7 +1,7 @@
-(ns ttt-adapter.core-spec
+(ns adapter.core-spec
   (:import (server Response Request))
   (:require [speclj.core :refer :all]
-            [ttt-adapter.core :as adapter]))
+            [adapter.core :as adapter]))
 
 (defn mock-handler
   ([status] (mock-handler status {"Content-Length" 5} "Cake"))
@@ -12,9 +12,7 @@
       :body body})))
 
 (defn mock-request [path action]
-  (let [request (Request. path (clojure.string/upper-case (name action)))]
-    (println (.getAction request))
-    request))
+  (Request. path (clojure.string/upper-case (name action))))
 
 (defn mock-ring-response
   ([status] (mock-ring-response status {}))
@@ -64,7 +62,7 @@
 
 (describe "body-in-bytes"
           (it "can read a file and convert its contents to bytes."
-              (let [file1 (clojure.java.io/file "spec/ttt_adapter/fixtures/file1.txt")
+              (let [file1 (clojure.java.io/file "spec/adapter/fixtures/file1.txt")
                     body-in-bytes (adapter/body-in-bytes file1)]
                 (should= "this file has content\n" (String. body-in-bytes))))
           (it "can read a string and convert it to bytes"
