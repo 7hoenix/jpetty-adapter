@@ -2,7 +2,8 @@
   (:import (server Server WrappedServerSocket Handler Request Response ApplicationBuilder)
            (java.net ServerSocket)
            (java.io ByteArrayInputStream))
-  (:require [clojure.string :as string]
+  (:require [ttt-adapter.converter :as converter]
+            [clojure.string :as string]
             [clojure.tools.trace :as t]
             [clojure.java.io :as io]))
 
@@ -80,7 +81,7 @@
 
 (defn run-jpetty [application]
   (let [ring-application (.build
-                           (ApplicationBuilder/setHandler
+                           (ApplicationBuilder/forHandler
                              (wrap-ring application)))
         wrapped-server-socket (WrappedServerSocket. (ServerSocket. 5000)
                                                     ring-application)
